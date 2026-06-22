@@ -7,9 +7,29 @@ const notes = (await getCollection('notes', ({ data }) => !data.draft))
 
 const fmt = (d: Date) =>
   d.toLocaleDateString('id-ID', { year: 'numeric', month: 'short' });
+
+const site = Astro.site?.href ?? 'https://csharp-indonesia.com/';
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'C# Indonesia',
+    description: 'Catatan praktis tentang C# modern dan agentic coding, dalam Bahasa Indonesia.',
+    url: site,
+    inLanguage: 'id-ID',
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    name: 'Ahmad Ilham',
+    url: 'https://ahmadilham.dev',
+    sameAs: ['https://github.com/ahmadilham'],
+  },
+];
 ---
 
-<Base title="C# Indonesia — catatan C# modern & agentic coding">
+<Base title="C# Indonesia — catatan C# modern & agentic coding" jsonLd={jsonLd}>
   <main>
     <!-- ===== Hero ===== -->
     <header class="hero">
@@ -48,7 +68,7 @@ const fmt = (d: Date) =>
               <span class="entry-body">
                 <span class="entry-topline">
                   <span class="entry-topic">{note.data.topik}</span>
-                  <span class="entry-date">{fmt(note.data.tanggal)}</span>
+                  <time class="entry-date" datetime={note.data.tanggal.toISOString()}>{fmt(note.data.tanggal)}</time>
                 </span>
                 <span class="entry-title">{note.data.title}</span>
                 <span class="entry-stand">{note.data.ringkasan}</span>
