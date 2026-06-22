@@ -1,0 +1,88 @@
+---
+import '../styles/global.css';
+
+export interface Props {
+  title: string;
+  description?: string;
+}
+
+const {
+  title,
+  description = 'Catatan praktis tentang C# modern dan agentic coding, dalam Bahasa Indonesia.',
+} = Astro.props;
+
+const tahun = new Date().getFullYear();
+---
+
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <title>{title}</title>
+  </head>
+  <body>
+    <slot />
+
+    <footer class="site-foot">
+      <div class="wrap foot-inner">
+        <span class="foot-mark">C#</span>
+        <p class="foot-meta">
+          C# Indonesia &middot; catatan C# modern &amp; agentic coding &middot; {tahun}
+        </p>
+        <nav class="foot-links" aria-label="Tautan">
+          <a href="https://archive.csharp-indonesia.com">Arsip</a>
+          <a href="https://github.com/ahmadilham">GitHub</a>
+        </nav>
+      </div>
+    </footer>
+
+    <style>
+      .site-foot {
+        border-top: 1px solid var(--hair);
+        margin-top: 5rem;
+        padding: 2rem 0 3rem;
+      }
+      .foot-inner {
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+        flex-wrap: wrap;
+      }
+      .foot-mark {
+        font-family: var(--mono);
+        font-weight: 600;
+        font-size: 0.8rem;
+        letter-spacing: 0.03em;
+        color: var(--bg);
+        background: var(--violet);
+        border-radius: 4px;
+        padding: 0.15rem 0.45rem;
+      }
+      .foot-meta {
+        font-family: var(--mono);
+        font-size: 0.76rem;
+        color: var(--ink-faint);
+        margin-right: auto;
+      }
+      .foot-links { display: flex; gap: 1.25rem; }
+      .foot-links a {
+        font-family: var(--mono);
+        font-size: 0.76rem;
+        color: var(--ink-soft);
+      }
+      .foot-links a:hover { color: var(--violet); text-decoration: none; }
+      @media (max-width: 560px) {
+        .foot-meta { margin-right: 0; width: 100%; order: 3; }
+      }
+    </style>
+  </body>
+</html>

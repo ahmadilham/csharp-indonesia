@@ -1,0 +1,133 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+
+export async function getStaticPaths() {
+  const notes = await getCollection('notes', ({ data }) => !data.draft);
+  return notes.map((note) => ({
+    params: { slug: note.id },
+    props: { note },
+  }));
+}
+
+type Props = { note: CollectionEntry<'notes'> };
+const { note } = Astro.props;
+const { Content } = await render(note);
+
+const fmt = (d: Date) =>
+  d.toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
+---
+
+<Base title={`${note.data.title} — C# Indonesia`} description={note.data.ringkasan}>
+  <main class="wrap note">
+    <a class="back" href="/">&larr; Semua catatan</a>
+
+    <article>
+      <header class="note-head">
+        <p class="note-topline">
+          <span class="eyebrow">{note.data.topik}</span>
+          <span class="note-date">{fmt(note.data.tanggal)}</span>
+        </p>
+        <h1 class="note-title">{note.data.title}</h1>
+        <p class="note-stand">{note.data.ringkasan}</p>
+      </header>
+
+      <div class="note-body">
+        <Content />
+      </div>
+
+      {note.data.sumber && (
+        <p class="note-source">
+          Referensi: <a href={note.data.sumber} rel="noopener">{note.data.sumber}</a>
+        </p>
+      )}
+    </article>
+  </main>
+
+  <style>
+    .note { padding-top: 3rem; max-width: 760px; }
+
+    .back {
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      color: var(--ink-faint);
+      display: inline-block;
+      margin-bottom: 2.5rem;
+    }
+    .back:hover { color: var(--violet); text-decoration: none; }
+
+    .note-head {
+      padding-bottom: 1.75rem;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid var(--hair);
+    }
+    .note-topline {
+      display: flex;
+      align-items: baseline;
+      gap: 0.9rem;
+      margin-bottom: 1rem;
+    }
+    .note-date {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+    }
+    .note-title {
+      font-family: var(--mono);
+      font-weight: 600;
+      font-size: clamp(1.7rem, 4.5vw, 2.5rem);
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 1.1rem;
+    }
+    .note-stand {
+      font-size: clamp(1.1rem, 2.4vw, 1.35rem);
+      line-height: 1.5;
+      color: var(--ink-soft);
+      border-left: 2px solid var(--violet);
+      padding-left: 1rem;
+    }
+
+    .note-body { font-size: 1.06rem; color: var(--ink); }
+    .note-body :global(p) { margin: 1.25rem 0; max-width: var(--measure); }
+    .note-body :global(h2) {
+      font-family: var(--mono);
+      font-size: 1.25rem;
+      margin: 2.5rem 0 0.75rem;
+      letter-spacing: -0.01em;
+    }
+    .note-body :global(h3) {
+      font-family: var(--mono);
+      font-size: 1.05rem;
+      margin: 2rem 0 0.5rem;
+      color: var(--ink-soft);
+    }
+    .note-body :global(ul),
+    .note-body :global(ol) { margin: 1.25rem 0; padding-left: 1.4rem; max-width: var(--measure); }
+    .note-body :global(li) { margin: 0.5rem 0; }
+    .note-body :global(li)::marker { color: var(--violet); }
+    .note-body :global(blockquote) {
+      border-left: 2px solid var(--border);
+      padding-left: 1.1rem;
+      margin: 1.5rem 0;
+      color: var(--ink-soft);
+      font-style: italic;
+    }
+    .note-body :global(strong) { color: var(--ink); font-weight: 600; }
+    .note-body :global(a) { color: var(--cyan); }
+
+    .note-source {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--hair);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      color: var(--ink-faint);
+      word-break: break-all;
+    }
+    .note-source a { color: var(--ink-soft); }
+    .note-source a:hover { color: var(--violet); }
+  </style>
+</Base>
