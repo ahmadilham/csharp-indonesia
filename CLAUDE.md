@@ -42,3 +42,9 @@ Code blocks are highlighted via Shiki (`github-dark` theme, line wrap on) config
 ## Deploy
 
 Push to `main` → GitHub Actions (`.github/workflows/deploy.yml`, uses `withastro/action@v3`) builds and deploys to GitHub Pages. The site is build-time static, so source can't be served raw. Custom domain is pinned by `public/CNAME`; don't remove it.
+
+## Sibling site — keep infrastructure in sync
+
+`ahmadilham-dev` (ahmadilham.dev) is a twin built from the same Astro template. **Any change outside of content must be applied to both sites** — layout/`Base.astro`, SEO and meta tags, `astro.config.mjs`, integrations (sitemap, RSS, OG images), build/deploy workflow, and design-token/styling infrastructure. Content is site-specific and does *not* cross over: the notes themselves, their frontmatter, hero copy, and per-note text stay in their own repo.
+
+When porting a change, adapt for the differences: site name/domain, brand mark (`C#` / violet vs `AI` / amber), language (`lang="id"` vs `lang="en"`), and frontmatter keys (`ringkasan`/`tanggal`/`topik`/`sumber` here vs `standfirst`/`date`/`topic`/`source` there).
