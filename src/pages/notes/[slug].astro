@@ -16,9 +16,40 @@ const { Content } = await render(note);
 
 const fmt = (d: Date) =>
   d.toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
+
+const canonical = new URL(`/notes/${note.id}/`, Astro.site).href;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: note.data.title,
+  description: note.data.ringkasan,
+  datePublished: note.data.tanggal.toISOString(),
+  url: canonical,
+  mainEntityOfPage: canonical,
+  inLanguage: 'id-ID',
+  author: {
+    '@type': 'Person',
+    name: 'Ahmad Ilham',
+    url: 'https://ahmadilham.dev',
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: 'C# Indonesia',
+    url: 'https://csharp-indonesia.com',
+  },
+  ...(note.data.sumber && { isBasedOn: note.data.sumber }),
+  ...(note.data.topik && { keywords: note.data.topik }),
+};
 ---
 
-<Base title={`${note.data.title} — C# Indonesia`} description={note.data.ringkasan}>
+<Base
+  title={`${note.data.title} — C# Indonesia`}
+  description={note.data.ringkasan}
+  type="article"
+  publishedTime={note.data.tanggal.toISOString()}
+  jsonLd={jsonLd}
+>
   <main class="wrap note">
     <a class="back" href="/">&larr; Semua catatan</a>
 
@@ -26,7 +57,7 @@ const fmt = (d: Date) =>
       <header class="note-head">
         <p class="note-topline">
           <span class="eyebrow">{note.data.topik}</span>
-          <span class="note-date">{fmt(note.data.tanggal)}</span>
+          <time class="note-date" datetime={note.data.tanggal.toISOString()}>{fmt(note.data.tanggal)}</time>
         </p>
         <h1 class="note-title">{note.data.title}</h1>
         <p class="note-stand">{note.data.ringkasan}</p>
