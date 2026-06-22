@@ -16,7 +16,7 @@
 
   --ink:       #e8eaed;
   --ink-soft:  #aeb4bd;
-  --ink-faint: #6b7280;
+  --ink-faint: #7e8590;   /* captions, meta — AA (≥4.5:1) on --bg */
 
   --violet:     #a78bfa;   /* aksen — warna .NET/C# */
   --violet-dim: #3d1f78;
