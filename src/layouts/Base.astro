@@ -30,6 +30,18 @@ const tahun = new Date().getFullYear();
     <title>{title}</title>
   </head>
   <body>
+    <header class="site-top">
+      <div class="wrap top-inner">
+        <a class="brand" href="/" aria-label="C# Indonesia — beranda">
+          <span class="brand-mark">C#</span>
+          <span class="brand-name">C# Indonesia</span>
+        </a>
+        <nav class="top-links" aria-label="Tautan">
+          <a href="https://ahmadilham.dev">Portfolio</a>
+        </nav>
+      </div>
+    </header>
+
     <slot />
 
     <footer class="site-foot">
@@ -47,6 +59,42 @@ const tahun = new Date().getFullYear();
     </footer>
 
     <style>
+      .site-top {
+        border-bottom: 1px solid var(--hair);
+        padding: 0.9rem 0;
+      }
+      .top-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+      }
+      .brand { display: inline-flex; align-items: center; gap: 0.6rem; color: var(--ink); }
+      .brand:hover { text-decoration: none; }
+      .brand:hover .brand-name { color: var(--violet); }
+      .brand-mark {
+        font-family: var(--mono);
+        font-weight: 600;
+        font-size: 0.8rem;
+        letter-spacing: 0.03em;
+        color: var(--bg);
+        background: var(--violet);
+        border-radius: 4px;
+        padding: 0.15rem 0.45rem;
+      }
+      .brand-name {
+        font-family: var(--mono);
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: color 0.18s ease;
+      }
+      .top-links a {
+        font-family: var(--mono);
+        font-size: 0.76rem;
+        color: var(--ink-soft);
+      }
+      .top-links a:hover { color: var(--violet); text-decoration: none; }
+
       .site-foot {
         border-top: 1px solid var(--hair);
         margin-top: 5rem;
