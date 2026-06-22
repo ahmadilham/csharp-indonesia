@@ -35,13 +35,19 @@ menghasilkan controller generik yang mungkin tidak cocok dengan arsitektur
 Anda. Dengan konteks minimal — misalnya:
 
 ```
-Proyek ini pakai Minimal API di .NET 9, pola Result<T> untuk error,
-dan repository sudah ada di IUserRepository. Tambahkan endpoint GET
-/users/{id} mengikuti pola yang sama dengan endpoint yang sudah ada.
+This project uses Minimal API on .NET 9, the Result<T> pattern for error
+handling, and a repository already exists at IUserRepository. Add a GET
+/users/{id} endpoint following the same pattern as the existing endpoints.
 ```
 
 hasilnya langsung jauh lebih dekat dengan yang Anda butuhkan, dan revisinya
 sedikit.
+
+> Catatan: untuk agentic coding saya memakai **Claude Code**, dan dari
+> pengalaman prompt serta instruksinya bekerja paling baik dalam Bahasa
+> Inggris. Karena itu contoh prompt di atas sengaja ditulis dalam Bahasa
+> Inggris — narasi catatan tetap Bahasa Indonesia, tapi yang Anda ketikkan
+> ke agent sebaiknya Bahasa Inggris.
 
 ## Pelajaran praktisnya
 
