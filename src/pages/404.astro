@@ -1,0 +1,69 @@
+---
+import Base from '../layouts/Base.astro';
+
+// Served by GitHub Pages for any unmatched path. Known legacy posts already have
+// their own meta-refresh redirect pages (see redirects.mjs); this is the safety net
+// for stray Blogger URLs not in the sitemap — label/search pages, feeds, mobile
+// `?m=1` variants — sending them to the same path on the archive when it makes sense.
+const ARCHIVE = 'https://archive.csharp-indonesia.com';
+---
+
+<Base title="Halaman tidak ditemukan — C# Indonesia">
+  <script is:inline define:vars={{ ARCHIVE }}>
+    (function () {
+      var path = window.location.pathname;
+      // Old Blogger shapes: dated posts/archives, label search, and feeds.
+      var isLegacy =
+        /^\/\d{4}\/\d{2}\//.test(path) ||
+        /^\/(search|feeds)\//.test(path) ||
+        /\.html$/.test(path);
+      if (isLegacy) {
+        window.location.replace(ARCHIVE + path + window.location.search + window.location.hash);
+      }
+    })();
+  </script>
+
+  <main class="nf wrap">
+    <p class="eyebrow">404</p>
+    <h1 class="nf-title">Halaman tidak ditemukan</h1>
+    <p class="nf-body">
+      Tautan ini mungkin sudah pindah. Tulisan lama (2010–2014) kini ada di
+      <a href={ARCHIVE}>arsip</a>. Kalau kamu mengikuti tautan tutorial klasik,
+      sebentar lagi kamu akan diarahkan ke sana.
+    </p>
+    <nav class="nf-nav" aria-label="Tautan">
+      <a href="/">Beranda</a>
+      <span class="sep">/</span>
+      <a href={ARCHIVE}>Arsip lama</a>
+    </nav>
+  </main>
+
+  <style>
+    .nf { padding: clamp(4rem, 14vh, 9rem) 0 clamp(3rem, 8vh, 6rem); }
+    .nf-title {
+      font-family: var(--mono);
+      font-weight: 600;
+      font-size: clamp(1.8rem, 5vw, 2.8rem);
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin: 0.5rem 0 1.25rem;
+    }
+    .nf-body {
+      max-width: 52ch;
+      font-size: clamp(1.02rem, 2vw, 1.18rem);
+      line-height: 1.62;
+      color: var(--ink-soft);
+    }
+    .nf-body a { color: var(--ink); border-bottom: 2px solid var(--violet); padding-bottom: 1px; }
+    .nf-body a:hover { color: var(--violet); text-decoration: none; }
+    .nf-nav {
+      margin-top: 2rem;
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      color: var(--ink-faint);
+    }
+    .nf-nav a { color: var(--ink-soft); }
+    .nf-nav a:hover { color: var(--violet); text-decoration: none; }
+    .nf-nav .sep { margin: 0 0.6rem; color: var(--border); }
+  </style>
+</Base>
