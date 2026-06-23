@@ -3,6 +3,7 @@ title: "Bagian CLAUDE.md yang paling berdampak: peta proyek"
 ringkasan: "Kalau agent tidak diberi tahu struktur solution dan ke mana kode baru harus diletakkan, dia akan mengarang strukturnya sendiri — dan biasanya salah untuk arsitektur Anda."
 tanggal: 2026-06-22
 topik: "Claude Code"
+sumber: "https://github.com/ahmadilham/dotnet-claude-md-starter/blob/main/CLAUDE.md#project-map"
 draft: false
 ---
 

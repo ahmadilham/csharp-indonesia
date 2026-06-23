@@ -3,6 +3,7 @@ title: "Definition of done yang bisa dijalankan agen: gerbang kualitas di CLAUDE
 ringkasan: "Agent gemar bilang 'selesai' tanpa benar-benar memverifikasi. Solusinya bukan memarahi, tapi menulis definition of done yang bisa dia jalankan sendiri."
 tanggal: 2026-06-23
 topik: "Claude Code"
+sumber: "https://github.com/ahmadilham/dotnet-claude-md-starter/blob/main/CLAUDE.md#definition-of-done"
 draft: false
 ---
 

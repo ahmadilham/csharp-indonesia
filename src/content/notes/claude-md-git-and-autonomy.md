@@ -3,6 +3,7 @@ title: "Git dan otonomi di CLAUDE.md: kapan agen jalan sendiri, kapan bertanya"
 ringkasan: "Aturan git dan batas otonomi yang eksplisit mengurangi friksi dua arah — agent berhenti meminta izin untuk hal remeh, dan berhenti mengambil keputusan yang seharusnya milik Anda."
 tanggal: 2026-06-23
 topik: "Claude Code"
+sumber: "https://github.com/ahmadilham/dotnet-claude-md-starter/blob/main/CLAUDE.md#git-rules"
 draft: false
 ---
 

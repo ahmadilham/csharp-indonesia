@@ -3,6 +3,7 @@ title: "CLAUDE.md: manual operasi proyek yang dibaca agen setiap sesi"
 ringkasan: "CLAUDE.md bukan dokumentasi biasa — ini konteks permanen yang Claude Code baca di awal tiap sesi, dan paling berguna kalau ditumbuhkan dari friksi nyata, bukan ditulis sempurna di awal."
 tanggal: 2026-06-21
 topik: "Claude Code"
+sumber: "https://github.com/ahmadilham/dotnet-claude-md-starter"
 draft: false
 ---
 
@@ -76,6 +77,20 @@ perhatian agent. Karena itu:
 > instruksi untuk Claude Code bekerja paling baik dalam Bahasa Inggris. Narasi
 > catatan ini tetap Bahasa Indonesia, tapi file yang dibaca agent berbahasa
 > Inggris.
+
+## Contoh lengkap yang bisa Anda salin
+
+Semua bagian di atas saya rangkai jadi satu CLAUDE.md contoh untuk proyek .NET
+Clean Architecture, di repo
+[`dotnet-claude-md-starter`](https://github.com/ahmadilham/dotnet-claude-md-starter).
+Salin filenya ke root repo Anda, ganti placeholder-nya, lalu sesuaikan.
+
+Repo itu sengaja saya rawat sebagai **contoh yang hidup.** Karena CLAUDE.md
+memang tumbuh dari friksi, isinya akan terus saya perbarui — dan ke depan saya
+berencana menambahkan hal-hal yang biasa menemaninya: template pull request,
+folder `docs/`, serta alur kerja untuk tool MCP seperti integrasi JIRA. Jadi
+perlakukan catatan ini sebagai penjelasan prinsipnya, dan repo itu sebagai versi
+terbaru yang berjalan.
 
 ## Intinya
 
