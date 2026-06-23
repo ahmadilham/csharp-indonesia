@@ -89,7 +89,7 @@ code {
   padding: 0.1em 0.4em;
 }
 pre {
-  background: #0d1117 !important;
+  background: #011627 !important; /* match Shiki night-owl ground */
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 1rem 1.1rem;
