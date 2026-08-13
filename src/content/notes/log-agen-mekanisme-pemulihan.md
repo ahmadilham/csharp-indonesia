@@ -1,7 +1,7 @@
 ---
 title: "Log agen bukan dokumentasi — itu mekanisme pemulihan saat sesi mati"
 ringkasan: "Sesi agent bisa kehabisan konteks atau berhenti di tengah kerja, dan seluruh alasan di balik keputusannya ikut hilang. Log append-only yang ditulis sebelum tiap tahap membuat sesi berikutnya melanjutkan, bukan mengulang."
-tanggal: 2026-08-13
+tanggal: 2026-08-12
 topik: "Agentic Coding"
 sumber: "https://claude.com/blog/the-new-rules-of-context-engineering-for-claude-5-generation-models"
 draft: false

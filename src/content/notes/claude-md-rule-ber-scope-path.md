@@ -1,7 +1,7 @@
 ---
 title: "Jangan taruh semua aturan di CLAUDE.md: rule yang ber-scope path"
 ringkasan: "CLAUDE.md dibaca utuh di setiap sesi, jadi aturan migrasi ikut terbaca saat Anda hanya menyentuh controller. Aturan yang cuma berlaku di satu folder sebaiknya dimuat ketika folder itu disentuh."
-tanggal: 2026-08-13
+tanggal: 2026-08-11
 topik: "Claude Code"
 sumber: "https://code.claude.com/docs/en/memory"
 draft: false
@@ -35,18 +35,17 @@ paths:
   - "src/Shop.Data/ApplicationDbContext.cs"
 ---
 
-# Migrasi harus jalan di SQL Server 2016
+# Migrasi harus jalan di SQL Server 2017
 
-Database produksi masih **SQL Server 2016**, sementara dev lokal pakai 2022.
+Database produksi masih **SQL Server 2017**, sementara dev lokal pakai 2022.
 T-SQL yang lebih baru jalan mulus di lokal, lalu gagal saat deploy — itu
 seluruh jebakannya.
 
 | Konstruksi | Mulai ada di | Pakai ini |
 |---|---|---|
-| `STRING_AGG` | 2017 | `FOR XML PATH('')` |
-| `TRIM` | 2017 | `LTRIM(RTRIM(x))` |
 | `GREATEST` / `LEAST` | 2022 | `CASE WHEN` |
-| `IS DISTINCT FROM` | 2022 | `((a <> b) OR (a IS NULL) <> (b IS NULL))` |
+| `IS DISTINCT FROM` | 2022 | `(a <> b) OR (a IS NULL AND b IS NOT NULL) OR (a IS NOT NULL AND b IS NULL)` |
+| `GENERATE_SERIES` | 2022 | tabel angka atau CTE rekursif |
 
 Migrasi juga **berurutan** — jangan pernah diparalelkan antar-agent.
 ````
@@ -55,7 +54,7 @@ Isi sepanjang itu tidak perlu masuk CLAUDE.md sama sekali. CLAUDE.md cukup
 menyimpan satu baris penunjuk:
 
 ```markdown
-- **Migrasi harus jalan di SQL Server 2016** (DB deploy). Konstruksi terlarang
+- **Migrasi harus jalan di SQL Server 2017** (DB deploy). Konstruksi terlarang
   dan cara mengeceknya di lokal: rule `migrations`, dimuat otomatis saat Anda
   menyentuh `src/Shop.Data/Migrations/**`.
 ```
@@ -77,7 +76,7 @@ alasan gampang dinegosiasikan; larangan dengan korban tidak. Bentuknya kira-kira
 begini — **ganti dengan kejadian dari proyek Anda sendiri, jangan pakai contoh
 ini apa adanya**:
 
-> Migrasi `20260214_AddUsageRollup` memakai `STRING_AGG`, lolos semua tes lokal,
+> Migrasi `20260214_AddUsageRollup` memakai `GREATEST`, lolos semua tes lokal,
 > lalu menghancurkan deploy. Ditulis ulang di PR #455.
 
 Satu kalimat seperti itu memberi agent alasan untuk patuh, bukan sekadar
@@ -87,11 +86,11 @@ insiden akan Anda percayai lebih sedikit setiap kali Anda membacanya kembali.
 Sekalian sertakan cara memverifikasinya sendiri:
 
 ```bash
-docker run --rm -d --name sql2016check -e ACCEPT_EULA=Y \
+docker run --rm -d --name sql2017check -e ACCEPT_EULA=Y \
   -e SA_PASSWORD=Local_dev_1 -p 1499:1433 \
-  mcr.microsoft.com/mssql/server:2016-latest
+  mcr.microsoft.com/mssql/server:2017-latest
 dotnet ef database update --connection "Server=localhost,1499;..."
-docker rm -f sql2016check
+docker rm -f sql2017check
 ```
 
 ## Sekarang ini bukan lagi sekadar preferensi saya
