@@ -35,28 +35,31 @@ paths:
   - "src/Shop.Data/ApplicationDbContext.cs"
 ---
 
-# Migrasi harus jalan di SQL Server 2017
+# Migrations must run on SQL Server 2017
 
-Database produksi masih **SQL Server 2017**, sementara dev lokal pakai 2022.
-T-SQL yang lebih baru jalan mulus di lokal, lalu gagal saat deploy — itu
-seluruh jebakannya.
+The deploy database is still **SQL Server 2017**; local dev runs 2022. Newer
+T-SQL runs cleanly on your machine and fails on deploy — that is the whole trap.
 
-| Konstruksi | Mulai ada di | Pakai ini |
+| Construct | Added in | Use instead |
 |---|---|---|
 | `GREATEST` / `LEAST` | 2022 | `CASE WHEN` |
 | `IS DISTINCT FROM` | 2022 | `(a <> b) OR (a IS NULL AND b IS NOT NULL) OR (a IS NOT NULL AND b IS NULL)` |
-| `GENERATE_SERIES` | 2022 | tabel angka atau CTE rekursif |
+| `GENERATE_SERIES` | 2022 | a numbers table or a recursive CTE |
 
-Migrasi juga **berurutan** — jangan pernah diparalelkan antar-agent.
+Migrations are also **sequential** — never parallelize them across agents.
 ````
+
+Perhatikan isinya berbahasa Inggris. Sama seperti CLAUDE.md di catatan-catatan
+sebelumnya: yang dibaca agent ditulis dalam Bahasa Inggris, narasi catatannya
+saja yang Bahasa Indonesia.
 
 Isi sepanjang itu tidak perlu masuk CLAUDE.md sama sekali. CLAUDE.md cukup
 menyimpan satu baris penunjuk:
 
 ```markdown
-- **Migrasi harus jalan di SQL Server 2017** (DB deploy). Konstruksi terlarang
-  dan cara mengeceknya di lokal: rule `migrations`, dimuat otomatis saat Anda
-  menyentuh `src/Shop.Data/Migrations/**`.
+- **Migrations must run on SQL Server 2017** (the deploy DB). Banned constructs
+  and how to verify locally: the `migrations` rule, loaded automatically when
+  you touch the Migrations folder or `ApplicationDbContext.cs`.
 ```
 
 ## Kenapa ini bukan sekadar rapi-rapi
@@ -76,8 +79,8 @@ alasan gampang dinegosiasikan; larangan dengan korban tidak. Bentuknya kira-kira
 begini — **ganti dengan kejadian dari proyek Anda sendiri, jangan pakai contoh
 ini apa adanya**:
 
-> Migrasi `20260214_AddUsageRollup` memakai `GREATEST`, lolos semua tes lokal,
-> lalu menghancurkan deploy. Ditulis ulang di PR #455.
+> Migration `20260214_AddUsageRollup` used `GREATEST`, passed every local test,
+> then broke the deploy. Rewritten in PR #455.
 
 Satu kalimat seperti itu memberi agent alasan untuk patuh, bukan sekadar
 perintah. Tapi kalimat itu hanya bekerja kalau benar: aturan yang mengarang
@@ -114,10 +117,8 @@ layak dipertahankan biasanya yang tidak bisa disimpulkan sendiri oleh agent dari
 membaca kode di sekitarnya — versi SQL Server di server produksi termasuk;
 "pakai `var` kalau tipenya jelas" tidak.
 
-Untuk mengeceknya, ada `/doctor` di Claude Code. Dia membaca CLAUDE.md Anda dan
-mengusulkan pemangkasan: membuang yang bisa disimpulkan sendiri dari kode
-(struktur folder, daftar dependensi, ringkasan arsitektur), menyisakan jebakan,
-alasan, dan konvensi yang menyimpang dari default.
+Kalau Anda ingin memangkas CLAUDE.md yang sudah terlanjur gemuk, ada `/doctor`
+di Claude Code — saya bahas alat itu dan seluruh soal pemangkasan di catatan 08.
 
 Satu pembeda yang gampang tertukar sekalian: **rule bukan skill.** Rule
 ber-scope path dimuat begitu agent menyentuh file yang cocok — dia tidak tahu

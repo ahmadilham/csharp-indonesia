@@ -11,8 +11,11 @@ Tujuh catatan sebelumnya di seri ini punya satu bentuk yang sama: ada friksi,
 tuliskan aturannya, taruh di konteks yang dibaca agent. Catatan 02 bahkan
 menjadikannya metode — **tumbuhkan CLAUDE.md dari friksi nyata.**
 
-Metode itu punya cacat yang baru saya sadari: dia cuma punya tombol tambah.
-Tidak pernah saya pasangkan dengan aturan kapan sesuatu harus keluar lagi.
+Catatan 02 sebenarnya sudah menyuruh Anda membuang — *"buang yang sudah usang"*,
+*"buang yang tidak lagi benar"*. Jadi tombol hapusnya ada. Yang salah adalah
+barnya: **usang** menuntut sesuatu lebih dulu menjadi *salah* sebelum layak
+dibuang. Yang baru saya pahami, aturan yang masih sepenuhnya benar pun bisa
+merugikan — kalau agent akan sampai ke sana sendiri tanpa Anda tuliskan.
 
 Anthropic baru saja menerbitkan [apa yang mereka pelajari setelah menghapus
 lebih dari 80% system prompt Claude
@@ -58,14 +61,9 @@ keduanya layak dipertahankan:
 
 ## Bagian seri ini yang tidak selamat
 
-**Catatan 03 (peta proyek) paling banyak kehilangan.** Saya menyebutnya bagian
-"paling berdampak", dan sebagian besar isinya sekarang justru yang pertama
-dipangkas — `/doctor` secara spesifik membuang struktur folder, daftar
-dependensi, dan ringkasan arsitektur, karena semuanya bisa disimpulkan dari
-kode. Daftar project beserta isinya termasuk di situ.
-
-Yang **selamat** dari catatan itu justru dua hal yang dulu saya anggap
-pelengkap:
+**Catatan 03 (peta proyek) hasilnya terbelah**, dan tidak di tempat yang saya
+duga. Dua dari tiga bagiannya selamat — justru dua yang dulu saya perlakukan
+sebagai pelengkap:
 
 ```
 Rule: dependencies point inward. Domain must never reference Application,
@@ -74,9 +72,19 @@ an interface in Application, implemented in Infrastructure.
 ```
 
 Agent yang membaca solution Anda melihat referensi yang *sudah ada* — dia tidak
-punya cara tahu mana yang terlarang. Dan tabel "kalau membangun X, taruh di Y"
-selamat karena isinya keputusan untuk kode yang belum ditulis. Peta yang
-menggambarkan keadaan: buang. Peta yang menyatakan batas: simpan.
+punya cara tahu mana yang terlarang. Blok itu sekilas tampak seperti deskripsi
+struktur, padahal tiap barisnya sebenarnya batasan: *"Depends on NOTHING."* Yang
+kedua, tabel "kalau membangun X, taruh di Y", selamat karena isinya keputusan
+untuk kode yang belum ditulis. Peta yang menggambarkan keadaan: buang. Peta yang
+menyatakan batas: simpan.
+
+Yang **gugur** justru bagian ketiga, yang tidak saya duga: konvensi penamaan.
+`record` untuk DTO, `sealed class` untuk service, suffix `Async`, file-scoped
+namespace — semuanya sudah terbaca dari sepuluh file pertama yang agent buka.
+Itu contoh paling murni dari aturan yang benar tapi tidak perlu ditulis. Dan
+godaan yang catatan 03 sendiri sudah peringatkan — mendaftar project satu per
+satu, alih-alih menjelaskan arah referensinya — memang termasuk yang pertama
+dipangkas `/doctor`.
 
 **Catatan 04 (definition of done) selamat, tapi ada tempat yang lebih baik
 untuknya.** Gate seperti `dotnet build` dan `dotnet test` memang harus jalan,
@@ -86,9 +94,13 @@ patuh. Untuk sesuatu yang wajib jalan di titik tertentu, dokumentasinya menyaran
 putuskan. Aturan yang naik jadi hook boleh turun dari CLAUDE.md. Yang tersisa di
 sana cukup alasannya, bukan checklist-nya.
 
-**Catatan 05 (git dan otonomi) selamat utuh**, dan alasannya tepat sesuai tes di
-atas: apakah sebuah push bisa ditarik kembali di organisasi Anda bukan hal yang
-bisa disimpulkan dari membaca kode. Itu fakta tentang lingkungan, bukan selera.
+**Catatan 05 (git dan otonomi) selamat hampir utuh.** Gerbang konfirmasi dan
+batas otonomi lolos telak, tepat sesuai tes di atas: apakah sebuah push bisa
+ditarik kembali di organisasi Anda bukan hal yang bisa disimpulkan dari membaca
+kode. Itu fakta tentang lingkungan, bukan selera. Yang tidak lolos justru dua
+baris paling tidak berbahaya di sana — pola penamaan branch dan daftar
+conventional commits. Tiga puluh detik membaca `git log` sudah cukup untuk
+menyimpulkan keduanya.
 
 **Aturan keras di catatan 04 juga selamat** — filter `TenantId`, PII yang tidak
 boleh masuk log. Artikel itu sendiri memberi pengecualian untuk area yang
@@ -101,9 +113,12 @@ langsung terpakai untuk repo .NET:
 
 - **Progressive disclosure** — muat saat dibutuhkan, bukan semua di depan. Ini
   yang saya bahas panjang di catatan 06: `.claude/rules/` dengan `paths`.
-- **Repetisi → satu deskripsi jelas.** Kalau aturan yang sama muncul di
-  CLAUDE.md, di rule, dan di skill, Anda tidak menegaskannya tiga kali — Anda
-  membuat tiga tempat yang bisa saling bertentangan nanti.
+- **Repetisi → deskripsi tool yang sederhana.** Prinsip aslinya spesifik soal
+  tool: instruksinya cukup hidup di deskripsi tool itu sendiri, tidak perlu
+  diulang lagi di system prompt. Ekstrapolasi saya — bukan klaim mereka — kalau
+  aturan yang sama muncul di CLAUDE.md, di rule, dan di skill, Anda tidak
+  menegaskannya tiga kali; Anda membuat tiga tempat yang bisa saling
+  bertentangan nanti.
 - **Manual memory → auto memory.** Agent menulis sendiri apa yang layak diingat;
   Anda tidak perlu lagi mencatat manual hal seperti perintah build. Perbedaannya
   dengan log agen saya bahas di catatan 07.
@@ -119,9 +134,10 @@ bisa disimpulkan sendiri dari kode, menyisakan jebakan, alasan, dan konvensi
 yang menyimpang dari default. Perlakukan hasilnya seperti review: baca usulannya,
 tolak yang salah.
 
-Target yang disebut dokumentasi: **di bawah 200 baris per file CLAUDE.md.**
-Kalau Anda di atas itu, yang rusak bukan cuma biaya konteks — kepatuhan ikut
-turun. Anda membayar lebih banyak untuk diikuti lebih jarang.
+Angka targetnya sudah saya sebut di catatan 06 — **di bawah 200 baris per file
+CLAUDE.md.** Yang perlu ditambahkan di sini cuma cara membaca angka itu: dia
+bukan anggaran biaya, dia ambang kepatuhan. Di atasnya, Anda membayar lebih
+banyak untuk diikuti lebih jarang.
 
 ## Intinya
 
