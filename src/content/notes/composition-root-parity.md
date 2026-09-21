@@ -80,7 +80,8 @@ public static class DependencyInjection
 }
 ```
 
-Sekarang kedua `Program.cs` memanggil `AddShopCore(config)` dan selesai. Tapi ini baru
+Sekarang kedua `Program.cs` cukup memanggil `builder.Services.AddShopCore(config)` — satu
+baris, sama di keduanya. Tapi ini baru
 **konvensi**, bukan gerbang: tidak ada yang mencegah orang berikutnya — atau agent —
 menambahkan satu `AddScoped` langsung di `Program.cs` karena itu jalan terpendek.
 
@@ -134,8 +135,12 @@ builder.Host.UseDefaultServiceProvider(o =>
 ```
 
 `ValidateOnBuild` memindahkan `Unable to resolve service` dari request pertama ke
-**startup**. Worker yang salah wiring mati saat deploy, bukan tiga jam kemudian saat
-pesan pertama masuk.
+**startup**: setiap dependency yang tidak bisa dipenuhi untuk service yang terdaftar
+ketahuan saat host dibangun. Worker yang salah wiring mati saat deploy, bukan tiga jam
+kemudian saat pesan pertama masuk. Perlu dicatat batasnya — yang diperiksa hanya
+constructor dari service yang **terdaftar**; `GetRequiredService<IAuditWriter>()` yang
+dipanggil langsung di tengah kode tetap lolos sampai baris itu jalan. Itu justru alasan
+lain untuk tidak mengandalkan satu mekanisme saja.
 
 ## Yang ditulis di CLAUDE.md
 
