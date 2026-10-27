@@ -5,8 +5,28 @@ import { getCollection } from 'astro:content';
 const notes = (await getCollection('notes', ({ data }) => !data.draft))
   .sort((a, b) => b.data.tanggal.valueOf() - a.data.tanggal.valueOf());
 
-const fmt = (d: Date) =>
+// The board's featured card is labelled "Terbaru", so it is simply the newest note.
+const featured = notes[0];
+const rest = notes.slice(1);
+
+// Each note keeps its number: the newest gets the highest.
+const numberOf = (id: string) => notes.length - notes.findIndex((n) => n.id === id);
+
+const topics = [...new Set(notes.map((n) => n.data.topik))].sort();
+
+const fmtMonth = (d: Date) =>
   d.toLocaleDateString('id-ID', { year: 'numeric', month: 'short' });
+const monthOnly = (d: Date) => d.toLocaleDateString('id-ID', { month: 'short' });
+
+const oldest = notes.length ? notes[notes.length - 1].data.tanggal : null;
+const newest = notes.length ? notes[0].data.tanggal : null;
+const span = !oldest || !newest
+  ? '—'
+  : oldest.getFullYear() === newest.getFullYear()
+    ? `${monthOnly(oldest)} – ${monthOnly(newest)} ${newest.getFullYear()}`
+    : `${fmtMonth(oldest)} – ${fmtMonth(newest)}`;
+
+const ARCHIVE = 'https://archive.csharp-indonesia.com';
 
 const site = Astro.site?.href ?? 'https://csharp-indonesia.com/';
 
@@ -30,158 +50,430 @@ const jsonLd = [
 ---
 
 <Base title="C# Indonesia — catatan C# modern & agentic coding" jsonLd={jsonLd}>
+  <!-- ===== Hero — sits under the header's line grid ===== -->
+  <section class="wrap hero" slot="top">
+    <p class="eyebrow">C# modern &middot; Agentic coding &middot; Bahasa Indonesia</p>
+    <h1 class="hero-title">
+      C# di era <span class="hero-accent">agentic coding</span>.
+    </h1>
+    <p class="hero-lede">
+      Situs ini dulunya berisi tutorial C# klasik. Sekarang isinya catatan
+      tentang cara menulis C#/.NET modern dan bagaimana agentic coding
+      mengubah alur kerja. Bukan teori, tapi catatan dari praktik nyata.
+    </p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="#catatan">
+        Baca catatan
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14" /><path d="M19 12l-7 7-7-7" /></svg>
+      </a>
+      <a class="btn btn-secondary" href="https://github.com/ahmadilham">GitHub</a>
+      <a class="btn btn-secondary" href={ARCHIVE}>Arsip lama</a>
+    </div>
+  </section>
+
   <main>
-    <!-- ===== Hero ===== -->
-    <header class="hero">
-      <div class="wrap">
-        <p class="eyebrow">C# Indonesia</p>
-        <h1 class="hero-title">
-          C# di era<br /><span>agentic coding</span>
-        </h1>
-        <p class="hero-thesis">
-          Dulu situs ini berisi tutorial C# klasik. Sekarang jadi catatan
-          pribadi tentang cara saya menulis C#/.NET modern — terutama
-          bagaimana <em>agentic coding</em> mengubah alur kerja sehari-hari.
-          Bukan teori, tapi catatan dari praktik nyata. Dalam Bahasa Indonesia.
-        </p>
-        <nav class="hero-nav" aria-label="Tautan">
-          <a href="https://archive.csharp-indonesia.com">Arsip lama</a>
-          <span class="sep">/</span>
-          <a href="https://github.com/ahmadilham">GitHub</a>
-          <span class="sep">/</span>
-          <a href="https://ahmadilham.dev">Portfolio</a>
-        </nav>
-      </div>
-    </header>
+    <!-- ===== Ringkasan angka ===== -->
+    <section class="wrap stats-wrap" aria-label="Sekilas">
+      <dl class="stats">
+        <div class="stat">
+          <dt class="stat-num">{notes.length}</dt>
+          <dd class="stat-label">catatan terbit</dd>
+        </div>
+        <div class="stat">
+          <dt class="stat-num">{span}</dt>
+          <dd class="stat-label">rentang terbit</dd>
+        </div>
+        <div class="stat">
+          <dt class="stat-num">.NET &middot; C#</dt>
+          <dd class="stat-label">fokus teknis</dd>
+        </div>
+        <div class="stat">
+          <dt class="stat-num">Claude Code</dt>
+          <dd class="stat-label">alat agentic utama</dd>
+        </div>
+      </dl>
+    </section>
 
     <!-- ===== Catatan ===== -->
-    <section class="log wrap" aria-labelledby="notes-head">
-      <h2 id="notes-head" class="section-label">
-        <span class="eyebrow">Catatan</span>
-      </h2>
+    <section id="catatan" class="wrap notes" aria-labelledby="notes-head">
+      <div class="notes-head">
+        <h2 id="notes-head">Catatan terbaru</h2>
+        <div class="chips" role="group" aria-label="Saring catatan menurut topik">
+          <button type="button" class="chip" data-filter="all" aria-pressed="true">Semua</button>
+          {topics.map((topik) => (
+            <button type="button" class="chip" data-filter={topik} aria-pressed="false">{topik}</button>
+          ))}
+        </div>
+      </div>
 
-      <ol class="entries" role="list">
-        {notes.map((note, i) => (
-          <li class="entry">
-            <a class="entry-link" href={`/notes/${note.id}/`}>
-              <span class="entry-num">{String(notes.length - i).padStart(2, '0')}</span>
-              <span class="entry-body">
-                <span class="entry-topline">
-                  <span class="entry-topic">{note.data.topik}</span>
-                  <time class="entry-date" datetime={note.data.tanggal.toISOString()}>{fmt(note.data.tanggal)}</time>
-                </span>
-                <span class="entry-title">{note.data.title}</span>
-                <span class="entry-stand">{note.data.ringkasan}</span>
+      {featured && (
+        <a class="featured" href={`/notes/${featured.id}/`} data-topic={featured.data.topik}>
+          <span class="featured-meta">
+            <span class="featured-tag">Terbaru</span>
+            <span class="featured-sub">
+              No. {String(numberOf(featured.id)).padStart(2, '0')} &middot; {featured.data.topik} &middot; {fmtMonth(featured.data.tanggal)}
+            </span>
+          </span>
+          <span class="featured-title">{featured.data.title}</span>
+          <span class="featured-sum">{featured.data.ringkasan}</span>
+          <span class="featured-cta">
+            Baca catatan
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14" /><path d="M13 6l6 6-6 6" /></svg>
+          </span>
+        </a>
+      )}
+
+      <ol class="rows" role="list">
+        {rest.map((note) => (
+          <li class="row-item" data-topic={note.data.topik}>
+            <a class="row" href={`/notes/${note.id}/`}>
+              <span class="row-gutter">
+                <span>No. {String(numberOf(note.id)).padStart(2, '0')} &middot; {fmtMonth(note.data.tanggal)}</span>
+                <span class="row-topic">{note.data.topik}</span>
               </span>
+              <span class="row-body">
+                <span class="row-title">{note.data.title}</span>
+                <span class="row-sum">{note.data.ringkasan}</span>
+              </span>
+              <svg class="row-arrow" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7" /><path d="M8 7h9v9" /></svg>
             </a>
           </li>
         ))}
       </ol>
 
-      {notes.length === 0 && (
-        <p class="empty">Catatan pertama segera hadir.</p>
-      )}
+      <p class="rows-empty" hidden>Belum ada catatan untuk topik itu.</p>
+      {notes.length === 0 && <p class="rows-empty">Catatan pertama segera terbit.</p>}
+    </section>
+
+    <!-- ===== Arsip lama ===== -->
+    <section class="wrap archive-wrap" aria-labelledby="archive-head">
+      <div class="archive">
+        <div class="archive-lead">
+          <p class="eyebrow">Arsip lama</p>
+          <p class="archive-head" id="archive-head">Mencari tutorial C# klasik?</p>
+        </div>
+        <div class="archive-body">
+          <p>
+            Tutorial lama tetap tersedia di arsip. Beberapa contoh kodenya
+            mungkin sudah tidak sesuai dengan .NET versi terbaru.
+          </p>
+          <a class="btn btn-secondary archive-btn" href={ARCHIVE}>Buka arsip</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Situs saudara ===== -->
+    <section class="wrap sister-wrap">
+      <a class="sister" href="https://ahmadilham.dev/">
+        <span class="sister-mark" aria-hidden="true">ai<span class="sister-mark-dot"></span></span>
+        <span class="sister-copy">
+          <span class="sister-title">Ditulis oleh Ahmad Ilham, VP of Engineering</span>
+          <span class="sister-sum">Catatan kepemimpinan engineering dalam bahasa Inggris ada di ahmadilham.dev.</span>
+        </span>
+        <span class="sister-cta">
+          Kunjungi
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7" /><path d="M8 7h9v9" /></svg>
+        </span>
+      </a>
     </section>
   </main>
 
+  <script is:inline>
+    // The topic chips filter the list in place; there is no archive page.
+    (() => {
+      const chips = [...document.querySelectorAll('.chip[data-filter]')];
+      const items = [...document.querySelectorAll('.row-item[data-topic]')];
+      const featured = document.querySelector('.featured[data-topic]');
+      const empty = document.querySelector('.rows-empty[hidden]');
+      if (!chips.length) return;
+
+      chips.forEach((chip) => {
+        chip.addEventListener('click', () => {
+          const pick = chip.dataset.filter;
+          chips.forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
+
+          let shown = 0;
+          items.forEach((item) => {
+            const match = pick === 'all' || item.dataset.topic === pick;
+            item.hidden = !match;
+            if (match) shown += 1;
+          });
+          if (featured) {
+            const match = pick === 'all' || featured.dataset.topic === pick;
+            featured.hidden = !match;
+            if (match) shown += 1;
+          }
+          if (empty) empty.hidden = shown > 0;
+        });
+      });
+    })();
+  </script>
+
   <style>
-    .hero { padding: clamp(4rem, 12vh, 8rem) 0 clamp(2.5rem, 6vh, 4rem); }
-    .hero-title {
-      font-family: var(--mono);
-      font-weight: 600;
-      font-size: clamp(2.2rem, 6.5vw, 3.8rem);
-      line-height: 1.05;
-      letter-spacing: -0.03em;
-      margin: 0.5rem 0 1.5rem;
-    }
-    .hero-title span { color: var(--violet); }
-    .hero-thesis {
-      max-width: 56ch;
-      font-size: clamp(1.05rem, 2.2vw, 1.28rem);
-      line-height: 1.62;
-      color: var(--ink-soft);
-    }
-    .hero-thesis em {
-      font-style: normal;
-      color: var(--ink);
-      border-bottom: 2px solid var(--violet);
-      padding-bottom: 1px;
-    }
-    .hero-nav {
-      margin-top: 2rem;
-      font-family: var(--mono);
-      font-size: 0.85rem;
-      color: var(--ink-faint);
-    }
-    .hero-nav a { color: var(--ink-soft); }
-    .hero-nav a:hover { color: var(--violet); text-decoration: none; }
-    .hero-nav .sep { margin: 0 0.6rem; color: var(--border); }
-
-    .section-label {
-      margin-bottom: 1.75rem;
-      padding-bottom: 0.85rem;
-      border-bottom: 1px solid var(--hair);
-    }
-
-    .entries { list-style: none; display: flex; flex-direction: column; }
-    .entry { border-bottom: 1px solid var(--hair); }
-
-    .entry-link {
-      display: grid;
-      grid-template-columns: var(--rail) 1fr;
-      gap: 0.5rem;
-      padding: 1.6rem 0.5rem 1.6rem 0;
-      color: inherit;
-      transition: background 0.18s ease;
-    }
-    .entry-link:hover { text-decoration: none; background: var(--surface); }
-    .entry-link:hover .entry-num { color: var(--violet); }
-    .entry-link:hover .entry-title { color: var(--violet); }
-
-    .entry-num {
-      font-family: var(--mono);
-      font-size: 0.95rem;
-      font-weight: 500;
-      color: var(--ink-faint);
-      padding-left: 0.25rem;
-      transition: color 0.18s ease;
-    }
-    .entry-body { display: flex; flex-direction: column; gap: 0.35rem; padding-right: 0.5rem; }
-
-    .entry-topline {
+    /* ---------- hero ---------- */
+    .hero {
       display: flex;
-      align-items: baseline;
+      flex-direction: column;
+      gap: 1.75rem;
+      padding-top: clamp(3.5rem, 9vw, 6rem);
+      padding-bottom: 3.5rem;
+    }
+    .hero-title {
+      max-width: 900px;
+      margin: 0;
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      line-height: 1.02;
+      letter-spacing: -0.04em;
+      font-weight: 600;
+    }
+    .hero-accent { color: var(--accent-head); }
+    .hero-lede {
+      max-width: 660px;
+      margin: 0;
+      font-size: 1.1875rem;
+      line-height: 1.6;
+      color: var(--muted);
+    }
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      padding-top: 0.5rem;
+    }
+
+    /* ---------- stats ---------- */
+    .stats-wrap { padding-bottom: 4.5rem; }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      border-top: 1px solid var(--rule);
+      border-bottom: 1px solid var(--rule);
+    }
+    .stat {
+      padding: 1.375rem 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    .stat-num { font-size: 1.75rem; font-weight: 600; letter-spacing: -0.02em; }
+    .stat-label {
+      margin: 0;
+      font-family: var(--mono);
+      font-size: 0.8125rem;
+      color: var(--muted);
+    }
+
+    /* ---------- catatan ---------- */
+    .notes {
+      display: flex;
+      flex-direction: column;
+      gap: 1.75rem;
+      padding-bottom: 5rem;
+    }
+    .notes-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .notes-head h2 {
+      margin: 0;
+      font-size: 2rem;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+    }
+    .chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+    /* ---------- featured card ---------- */
+    .featured {
+      display: flex;
+      flex-direction: column;
+      gap: 1.125rem;
+      padding: 2.5rem;
+      border-radius: 18px;
+      background: var(--feat-bg);
+      border: 1px solid var(--feat-border);
+      color: var(--feat-ink);
+    }
+    .featured:hover { text-decoration: none; }
+    .featured:hover .featured-cta { gap: 0.75rem; }
+    .featured-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
       gap: 0.75rem;
       font-family: var(--mono);
-      font-size: 0.72rem;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
+      font-size: 0.75rem;
     }
-    .entry-topic { color: var(--violet); font-weight: 600; }
-    .entry-date { color: var(--ink-faint); }
-
-    .entry-title {
-      font-size: 1.2rem;
+    .featured-tag {
+      padding: 0.3125rem 0.625rem;
+      border-radius: 999px;
+      background: var(--accent);
+      color: #FFFFFF;
+    }
+    .featured-sub { color: var(--feat-muted); }
+    .featured-title {
+      max-width: 820px;
+      font-size: clamp(1.6rem, 3.2vw, 2.4rem);
+      line-height: 1.15;
+      letter-spacing: -0.03em;
       font-weight: 600;
-      line-height: 1.3;
+    }
+    .featured-sum {
+      max-width: 680px;
+      font-size: 1rem;
+      line-height: 1.6;
+      color: var(--feat-soft);
+    }
+    .featured-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9375rem;
+      color: var(--feat-soft);
+      transition: gap 0.15s ease;
+    }
+
+    /* ---------- baris catatan ---------- */
+    .rows { list-style: none; display: flex; flex-direction: column; gap: 0.75rem; }
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      gap: 0.75rem 2rem;
+      padding: 1.375rem 1.5rem;
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: 14px;
       color: var(--ink);
-      transition: color 0.18s ease;
+      transition: border-color 0.15s ease;
     }
-    .entry-stand {
-      font-size: 0.96rem;
-      color: var(--ink-soft);
-      max-width: var(--measure);
-    }
-
-    .empty {
+    .row:hover { text-decoration: none; border-color: var(--border); }
+    .row:hover .row-title { color: var(--accent-text); }
+    .row-gutter {
+      flex: 0 0 180px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.375rem;
+      padding-top: 0.25rem;
       font-family: var(--mono);
-      color: var(--ink-faint);
-      padding: 2rem 0;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+    .row-topic { color: var(--accent-text); }
+    .row-body {
+      flex: 999 1 420px;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.375rem;
+    }
+    .row-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      letter-spacing: -0.015em;
+      line-height: 1.3;
+      transition: color 0.15s ease;
+    }
+    .row-sum { font-size: 0.9375rem; line-height: 1.55; color: var(--muted); }
+    .row-arrow { margin-top: 0.25rem; flex-shrink: 0; color: var(--muted); }
+
+    .rows-empty {
+      font-family: var(--mono);
+      font-size: 0.875rem;
+      color: var(--muted);
+      padding: 1.5rem 0;
     }
 
-    @media (max-width: 600px) {
-      .entry-link { grid-template-columns: 1fr; gap: 0.5rem; padding-left: 0; }
-      .entry-num { padding-left: 0; font-size: 0.8rem; }
+    /* ---------- arsip ---------- */
+    .archive-wrap { padding-bottom: 5rem; }
+    .archive {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2.5rem;
+      padding: 2.5rem;
+      border-radius: 18px;
+      background: var(--surface);
+      border: 1px solid var(--rule);
+    }
+    .archive-lead { flex: 1 1 280px; display: flex; flex-direction: column; gap: 0.625rem; }
+    .archive-head {
+      margin: 0;
+      font-size: 1.625rem;
+      font-weight: 600;
+      letter-spacing: -0.025em;
+      line-height: 1.2;
+    }
+    .archive-body {
+      flex: 1 1 360px;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      align-items: flex-start;
+      font-size: 1rem;
+      line-height: 1.65;
+      color: var(--body);
+    }
+    .archive-btn { min-height: 44px; padding: 0 1.125rem; font-size: 0.9375rem; }
+
+    /* ---------- situs saudara ---------- */
+    .sister-wrap { padding-bottom: 6rem; }
+    .sister {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 1.75rem 2rem;
+      border-radius: 18px;
+      background: var(--sister-bg);
+      color: var(--ink);
+    }
+    .sister:hover { text-decoration: none; }
+    .sister:hover .sister-cta { gap: 0.75rem; }
+    .sister-mark {
+      position: relative;
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: var(--mark-bg);
+      color: var(--mark-fg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--mono);
+      font-weight: 500;
+      font-size: 1.0625rem;
+      flex-shrink: 0;
+    }
+    .sister-mark-dot {
+      position: absolute;
+      right: 7px;
+      bottom: 7px;
+      width: 7px;
+      height: 7px;
+      border-radius: 4px;
+      background: var(--blue);
+    }
+    .sister-copy { flex: 999 1 360px; display: flex; flex-direction: column; gap: 0.25rem; }
+    .sister-title { font-size: 1.1875rem; font-weight: 600; letter-spacing: -0.015em; }
+    .sister-sum { font-size: 0.9375rem; color: var(--sister-muted); }
+    .sister-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9375rem;
+      font-weight: 500;
+      color: var(--sister-text);
+      transition: gap 0.15s ease;
+    }
+
+    @media (max-width: 640px) {
+      .featured { padding: 1.75rem; }
+      .archive { padding: 1.75rem; gap: 1.75rem; }
+      .sister { padding: 1.5rem; }
+      .row { padding: 1.25rem; }
+      .row-gutter { flex-basis: 100%; flex-direction: row; gap: 0.75rem; padding-top: 0; }
     }
   </style>
 </Base>

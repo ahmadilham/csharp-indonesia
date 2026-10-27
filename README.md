@@ -80,9 +80,9 @@ langsung seperti HTML biasa.
 ```
 src/
   content/notes/      ← catatan Anda (Markdown) di sini
-  layouts/Base.astro  ← <head>, font, footer
+  layouts/Base.astro  ← <head>, font, nav, footer
   pages/index.astro   ← halaman depan (hero + daftar catatan)
   pages/notes/[slug]  ← template catatan
-  styles/global.css   ← token desain (aksen violet)
+  styles/global.css   ← token desain (aksen violet, mode terang & gelap)
 public/                ← favicon, CNAME, aset statis
 ```

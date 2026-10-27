@@ -12,7 +12,12 @@ export default defineConfig({
   integrations: [sitemap()],
   markdown: {
     shikiConfig: {
-      theme: 'night-owl',
+      // Two themes: the design ships a light default with a dark toggle.
+      // Same pair as ahmadilham.dev, so code reads alike on both sites.
+      themes: {
+        light: 'github-light',
+        dark: 'github-dark',
+      },
       wrap: true,
     },
   },
